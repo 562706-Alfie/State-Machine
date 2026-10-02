@@ -2,6 +2,7 @@
 //player.cs is the Monobehaviour and owns the Unity components
 //It passes control to the statemachine
 
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,6 +18,11 @@ public class PlayerScript : MonoBehaviour
     public Vector2 horizontalSpeed;
     public SpriteRenderer spriteRenderer;
 
+    public Vector3 boxSize;
+    public float maxDistance;
+    public Vector3 wallBoxSize;
+    public float wallMaxDistance;
+    public LayerMask layerMask;
 
     //define the actions
     public InputAction moveAction;
@@ -69,7 +75,40 @@ public class PlayerScript : MonoBehaviour
         }
 
     }
-    
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawCube(transform.position - transform.up * maxDistance, boxSize);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawCube(transform.position - transform.up * wallMaxDistance, wallBoxSize);
+    }
+
+    public bool GroundCheck()
+    {
+        if (Physics2D.BoxCast(transform.position, boxSize, 0, -transform.up, maxDistance, layerMask))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public bool WallCheck()
+    {
+        if (Physics2D.BoxCast(transform.position, wallBoxSize, 0, -transform.up, wallMaxDistance, layerMask))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     void OnTriggerEnter2D(Collider2D collision)
     {
         sm.currentState.OnTriggerEnter2D(collision);

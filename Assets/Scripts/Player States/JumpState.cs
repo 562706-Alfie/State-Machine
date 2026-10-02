@@ -7,7 +7,6 @@ using UnityEngine;
 
 public class JumpState : State
 {
-    protected bool canDoubleJump;
     //protected Vector2 verticalSpeed;
 
     public JumpState(PlayerScript player, StateMachine sm) : base(player, sm)
@@ -16,11 +15,10 @@ public class JumpState : State
 
     public override void Enter()
     {
-        player.isGrounded = false;
-        player.anim.Play("Jump");
-        verticalSpeed.y = 8f;
+
+            player.anim.Play("Jump");
+        verticalSpeed.y = 7f;
         player.rb.linearVelocityY = verticalSpeed.y;
-        player.jumpCount++;
         player.spriteRenderer = player.GetComponent<SpriteRenderer>();
     }
 
@@ -35,7 +33,7 @@ public class JumpState : State
 
         ReadInput();
 
-        if (player.moveAction.ReadValue<Vector2>().magnitude > 0.1f && player.isGrounded)
+        if (player.moveAction.ReadValue<Vector2>().magnitude > 0.1f && player.GroundCheck())
         {
             sm.ChangeState(sm.runState);
         }
@@ -43,6 +41,11 @@ public class JumpState : State
         if (player.rb.linearVelocityY < 0)
         {
             sm.ChangeState(sm.fallingState);
+        }
+
+        if (player.jumpCount == 2)
+        {
+            player.anim.Play("Double Jump");
         }
 
         // Movement here

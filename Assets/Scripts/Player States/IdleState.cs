@@ -36,13 +36,14 @@ public class IdleState : State
 
     public override void Update()
     {
-        if( player.moveAction.ReadValue<Vector2>().magnitude > 0.1f )
+        if (player.moveAction.ReadValue<Vector2>().magnitude > 0.1f )
         {
             sm.ChangeState(sm.runState);
         }
 
-        if (player.jumpAction.IsPressed())
+        if (player.jumpAction.IsPressed() && player.GroundCheck() && player.jumpCount < 2)
         {
+            player.jumpCount++;
             sm.ChangeState(sm.jumpState);
         }
 

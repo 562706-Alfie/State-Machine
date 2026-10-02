@@ -3,6 +3,7 @@
 //This means it inherits fields and methods from State.cs
 
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class RunState : State
 {
@@ -20,6 +21,7 @@ public class RunState : State
         Debug.Log("entering running state");
         player.anim.Play("Run");
         player.spriteRenderer = player.GetComponent<SpriteRenderer>();
+        player.jumpCount = 0;
     }
 
     public override void Exit()
@@ -35,17 +37,29 @@ public class RunState : State
 
         if (player.jumpAction.IsPressed() && player.jumpCount < 2)
         {
+            player.jumpCount++;
             sm.ChangeState(sm.jumpState);
         }
         
-        if (player.isGrounded)
+        if (player.GroundCheck())
         {
-            player.jumpCount = 0;
             if (player.rb.linearVelocityX < 0.1f && player.rb.linearVelocityX > -0.1f)
             {
                 sm.ChangeState(sm.idleState);
             }
         }
+        
+        if (!player.GroundCheck() && !player.jumpAction.IsPressed()) // For use when running of platforms, so the player can't jump twice
+        {
+            player.jumpCount++;
+            sm.ChangeState(sm.fallingState);
+        }
+        
+        if (player.rb.linearVelocityX == 0f)
+        {
+            sm.ChangeState(sm.fallingState);
+        }
+
 
         // Movement here
         Vector2 input = player.moveAction.ReadValue<Vector2>();

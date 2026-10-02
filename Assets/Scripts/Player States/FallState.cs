@@ -7,7 +7,7 @@ public class FallState : State
     public FallState(PlayerScript player, StateMachine sm) : base(player, sm)
     {
     }
-
+    
     public override void Enter()
     {
         Debug.Log("entering falling state");
@@ -23,20 +23,22 @@ public class FallState : State
     {
         ReadInput();
 
-        if ( player.isGrounded)
+        if (player.GroundCheck())
         {
             sm.ChangeState(sm.idleState);
         }
         
         if (player.jumpAction.IsPressed() && player.jumpCount < 2)
         {
+            player.jumpCount++;
             sm.ChangeState(sm.jumpState);
         }
         
-        if (player.moveAction.ReadValue<Vector2>().magnitude > 0.1f && player.isGrounded)
+        if (player.moveAction.ReadValue<Vector2>().magnitude > 0.1f && player.GroundCheck())
         {
             sm.ChangeState(sm.runState);
         }
+
 
         // Movement here
         Vector2 input = player.moveAction.ReadValue<Vector2>();
@@ -51,6 +53,7 @@ public class FallState : State
         {
             player.spriteRenderer.flipX = true;
         }
+
 
         UIscript.ui.DrawText("*** This is the falling state ***\n");
         UIscript.ui.DrawText("Left/Right arrows = Move State");
